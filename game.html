@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>10/10的秘密</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: rgba(21, 23, 30, 0.85);
+      --panel-strong: rgba(16, 18, 24, 0.96);
+      --surface: rgba(31, 34, 40, 0.9);
+      --surface-soft: rgba(45, 49, 58, 0.72);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --muted: #b3b9c6;
+      --gray: #7f8899;
+      --accent: #f5b0c9;
+      --accent-2: #a78bfa;
+      --gold: #facc15;
+      --green: #4ade80;
+      --red: #f87171;
+      --shadow: rgba(0, 0, 0, 0.28);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: "Segoe UI", "Noto Sans TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(167, 139, 250, 0.2), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(245, 176, 201, 0.15), transparent 20%),
+        linear-gradient(160deg, #090b11 0%, #141821 28%, #0d1016 100%);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app-shell {
+      width: min(100%, 960px);
+      min-height: calc(100vh - 32px);
+      background: rgba(14, 16, 22, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.42);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(15, 17, 21, 0.88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(245,176,201,0.22), rgba(167,139,250,0.35));
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #ffd6e7;
+      font-size: 0.88rem;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.15rem, 2vw, 1.65rem);
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    .status-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.83rem;
+    }
+
+    .status-pill.accent {
+      background: linear-gradient(135deg, rgba(245,176,201,0.14), rgba(167,139,250,0.18));
+      border-color: rgba(245,176,201,0.28);
+      color: #ffe9f3;
+    }
+
+    .content {
+      padding: 16px;
+    }
+
+    .feed {
+      border-radius: var(--radius);
+      background: rgba(19, 22, 29, 0.6);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .feed-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 16px 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 14px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .post-list, .clue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .post-card {
+      background: linear-gradient(180deg, rgba(19,22,29,0.96), rgba(15,18,24,0.92));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.14);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .avatar.a1 { background: linear-gradient(135deg, #ff9a9e, #fad0c4); }
+    .avatar.a2 { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
+    .avatar.a3 { background: linear-gradient(135deg, #a78bfa, #f9a8d4); }
+    .avatar.a4 { background: linear-gradient(135deg, #fbbf24, #f97316); }
+    .avatar.a5 { background: linear-gradient(135deg, #60a5fa, #22d3ee); }
+
+    .user-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .user-tag {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .post-body {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-line;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      color: var(--muted);
+    }
+
+    .action-chip {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 10px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .action-chip:active {
+      transform: scale(0.98);
+    }
+
+    .post-highlight {
+      margin-top: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hash-tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(167,139,250,0.12);
+      border: 1px solid rgba(167,139,250,0.22);
+      color: #d8c9ff;
+      font-size: 0.75rem;
+    }
+
+    .empty-state {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      min-height: 220px;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.02);
+      padding: 24px;
+    }
+
+    .empty-icon {
+      display: block;
+      font-size: 2rem;
+      margin-top: 10px;
+    }
+
+    .mystery-box {
+      background: linear-gradient(180deg, rgba(19,22,29,0.96), rgba(15,18,24,0.92));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.14);
+    }
+
+    .mystery-box h2 {
+      margin: 0 0 12px;
+      font-size: 1.3rem;
+    }
+
+    .mystery-box p {
+      color: var(--muted);
+      line-height: 1.8;
+      margin: 0 0 16px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .mystery-input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--text);
+      padding: 14px 16px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .mystery-input:focus {
+      border-color: rgba(245,176,201,0.4);
+      box-shadow: 0 0 0 3px rgba(245,176,201,0.12);
+    }
+
+    .primary-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      background: linear-gradient(135deg, #f5b0c9, #a78bfa);
+      color: #130d17;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 20px rgba(167,139,250,0.32);
+    }
+
+    .primary-btn.large {
+      width: 100%;
+      margin-top: 16px;
+      padding: 15px 18px;
+    }
+
+    .answer-feedback {
+      min-height: 24px;
+      margin-top: 12px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .answer-feedback.success {
+      color: var(--green);
+    }
+
+    .answer-feedback.error {
+      color: var(--red);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 8, 12, 0.75);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      z-index: 99;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      position: relative;
+      width: min(100%, 700px);
+      max-height: 84vh;
+      background: linear-gradient(180deg, rgba(18,21,27,0.98), rgba(12,14,20,0.98));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.46);
+      overflow: hidden;
+    }
+
+    .secret-card {
+      width: min(100%, 520px);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 22px 22px 26px;
+      overflow-y: auto;
+    }
+
+    .post-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .post-detail .post-body {
+      font-size: 1.08rem;
+    }
+
+    .post-detail .post-meta {
+      margin-top: 0;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .clue-item {
+      background: linear-gradient(180deg, rgba(26,30,37,0.96), rgba(14,16,22,0.92));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .clue-item h3 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .clue-item p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .secret-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      padding: 28px 22px 20px;
+    }
+
+    .secret-badge {
+      width: 74px;
+      height: 74px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(245,176,201,0.28), rgba(167,139,250,0.34));
+      font-size: 2rem;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .secret-body h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .secret-body p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .secret-reward {
+      width: 100%;
+      margin-top: 6px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      color: #f8d8e6;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .topbar-inner {
+        padding: 12px 14px;
+      }
+
+      .brand h1 {
+        font-size: 1.1rem;
+      }
+
+      .status-wrap {
+        gap: 8px;
+      }
+
+      .content {
+        padding: 12px;
+      }
+
+      .feed-tabs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .tab-btn {
+        padding: 14px 8px;
+        font-size: 0.8rem;
+      }
+
+      .post-card,
+      .mystery-box,
+      .clue-item {
+        padding: 14px;
+      }
+
+      .input-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .primary-btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .app-shell {
+        border-radius: 18px;
+      }
+
+      .brand-mark {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+      }
+
+      .status-pill {
+        padding: 7px 10px;
+        font-size: 0.75rem;
+      }
+
+      .post-header {
+        align-items: flex-start;
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span class="brand-mark">◎</span>
+          <h1>10/10的秘密</h1>
+        </div>
+        <div class="status-wrap">
+          <div class="status-pill">
+            <span>進度</span>
+            <strong id="progress-text">0%</strong>
+          </div>
+          <div class="status-pill accent">
+            <span>🔍</span>
+            <strong id="clue-count">0</strong>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="feed">
+        <div class="feed-tabs">
+          <button class="tab-btn active" data-tab="all">所有貼文</button>
+          <button class="tab-btn" data-tab="clues">線索</button>
+          <button class="tab-btn" data-tab="mystery">謎題</button>
+        </div>
+
+        <div id="tab-all" class="tab-panel active">
+          <div id="post-list" class="post-list"></div>
+        </div>
+
+        <div id="tab-clues" class="tab-panel">
+          <div id="clue-list" class="clue-list"></div>
+        </div>
+
+        <div id="tab-mystery" class="tab-panel">
+          <div class="mystery-box">
+            <h2>終極謎題</h2>
+            <p id="mystery-text">根據所有線索，輸入正確答案來解開真相。</p>
+            <div class="input-row">
+              <input id="answer-input" type="text" placeholder="輸入答案..." maxlength="20" class="mystery-input" />
+              <button id="submit-answer" class="primary-btn">提交</button>
+            </div>
+            <div id="answer-feedback" class="answer-feedback"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="post-modal" class="modal hidden">
+      <div class="modal-card">
+        <button id="close-modal" class="close-btn">×</button>
+        <div id="modal-body" class="modal-body"></div>
+      </div>
+    </div>
+
+    <div id="secret-modal" class="modal hidden">
+      <div class="modal-card secret-card">
+        <button id="close-secret" class="close-btn">×</button>
+        <div class="secret-body">
+          <div class="secret-badge">✦</div>
+          <h2 id="secret-title">秘密已解鎖</h2>
+          <p id="secret-message"></p>
+          <div id="secret-reward" class="secret-reward"></div>
+          <button id="restart-game" class="primary-btn large">重新開始</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const posts = [
+      {
+        id: "p1",
+        author: "Mira Chen",
+        avatarClass: "a1",
+        handle: "@mirachen",
+        time: "2 hours ago",
+        body: "At 10:47 PM, the dormitory alarm suddenly went off, but I definitely saw the corridor lights on the 3rd floor. Someone at the stairwell turned to look at me as if they were waiting for me to leave.",
+        tags: ["#night", "#dorm", "#something's-wrong"],
+        clue: {
+          title: "Alarm Timeline",
+          text: "The 10:47 PM alarm and the 3rd-floor corridor light suggest someone deliberately created a disturbance to draw attention away from the real action."
+        }
+      },
+      {
+        id: "p2",
+        author: "Avery Lin",
+        avatarClass: "a2",
+        handle: "@averylin",
+        time: "5 hours ago",
+        body: "I saw a photo in the 6th-floor class group chat: someone was standing on the balcony, and the background was a blurred ceiling. The photo was sent and deleted instantly. I still remember the person was wearing a black jacket with a small white band on the sleeve.",
+        tags: ["#photo", "#floor6", "#black-jacket"],
+        clue: {
+          title: "White Sleeve Band",
+          text: "A black jacket with a white band on the sleeve may be the key identifying mark for a suspect or a hidden accomplice."
+        }
+      },
+      {
+        id: "p3",
+        author: "Sofia Lee",
+        avatarClass: "a3",
+        handle: "@sofia_lee",
+        time: "this morning",
+        body: "Someone said the teacher had a problem and the elevator stopped at 9th floor. The door had a red jelly candy stuck in it. I only saw that kind of candy once before—in the dormitory lost-and-found box behind the office.",
+        tags: ["#jelly-candy", "#lost-and-found", "#office"],
+        clue: {
+          title: "Lost-and-Found Box",
+          text: "The red jelly candy along with the lost-and-found box suggests the evidence was hidden near the management office."
+        }
+      },
+      {
+        id: "p4",
+        author: "Admin Noah",
+        avatarClass: "a4",
+        handle: "@admin_noah",
+        time: "last night",
+        body: "After lunch today, the conference room door was slightly open. The whiteboard had been wiped clean, but one sentence remained in a faint trace: '10/10 of secret'. I'm not sure if it was a prank, but that phrase made me feel uneasy.",
+        tags: ["#whiteboard", "#secret", "#10/10"],
+        clue: {
+          title: "Whiteboard Message",
+          text: "The phrase '10/10 of secret' is likely the main clue and the final hidden answer."
+        }
+      },
+      {
+        id: "p5",
+        author: "Ethan Ross",
+        avatarClass: "a5",
+        handle: "@ethan_ross",
+        time: "2 minutes ago",
+        body: "Someone in the edit log saw a comment: 'If you cannot see the real answer, treat every person as the same person.' This message feels like a warning: don't trust appearances, the true secret is hidden in plain sight.",
+        tags: ["#clue", "#hidden", "#truth"],
+        clue: {
+          title: "The Real Answer",
+          text: "All evidence points to the same conclusion: the answer is not just a phrase, but the acknowledgment of a hidden truth behind the obvious."
+        }
+      }
+    ];
+
+    const discoveredClues = [];
+    const secretKey = "10/10的秘密";
+    const state = {
+      activeTab: "all",
+      clueCount: 0,
+      progress: 0,
+      unlocked: false
+    };
+
+    const postList = document.getElementById("post-list");
+    const clueList = document.getElementById("clue-list");
+    const modal = document.getElementById("post-modal");
+    const modalBody = document.getElementById("modal-body");
+    const clueCountText = document.getElementById("clue-count");
+    const progressText = document.getElementById("progress-text");
+    const answerInput = document.getElementById("answer-input");
+    const answerFeedback = document.getElementById("answer-feedback");
+    const mysteryText = document.getElementById("mystery-text");
+    const secretModal = document.getElementById("secret-modal");
+    const secretTitle = document.getElementById("secret-title");
+    const secretMessage = document.getElementById("secret-message");
+    const secretReward = document.getElementById("secret-reward");
+
+    function renderPosts() {
+      postList.innerHTML = "";
+
+      posts.forEach((post) => {
+        const card = document.createElement("article");
+        card.className = "post-card";
+
+        const header = document.createElement("div");
+        header.className = "post-header";
+
+        const avatar = document.createElement("div");
+        avatar.className = `avatar ${post.avatarClass}`;
+        avatar.textContent = post.author.charAt(0);
+
+        const meta = document.createElement("div");
+        meta.className = "user-meta";
+        meta.innerHTML = `
+          <div class="user-name">${post.author}</div>
+          <div class="user-tag">${post.handle} · ${post.time}</div>
+        `;
+
+        header.appendChild(avatar);
+        header.appendChild(meta);
+
+        const body = document.createElement("p");
+        body.className = "post-body";
+        body.textContent = post.body;
+
+        const tags = document.createElement("div");
+        tags.className = "post-highlight";
+        post.tags.forEach(tag => {
+          const elem = document.createElement("span");
+          elem.className = "hash-tag";
+          elem.textContent = tag;
+          tags.appendChild(elem);
+        });
+
+        const metaRow = document.createElement("div");
+        metaRow.className = "post-meta";
+        metaRow.innerHTML = `
+          <span>💬 28</span>
+          <span>❤️ 412</span>
+          <span>🔁 19</span>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "post-actions";
+        actions.innerHTML = `
+          <button class="action-chip" data-read="${post.id}">閱讀</button>
+          <button class="action-chip" data-clue="${post.id}">標記線索</button>
+        `;
+
+        card.appendChild(header);
+        card.appendChild(body);
+        card.appendChild(tags);
+        card.appendChild(metaRow);
+        card.appendChild(actions);
+
+        postList.appendChild(card);
+      });
+
+      bindPostActions();
+    }
+
+    function bindPostActions() {
+      document.querySelectorAll("[data-read]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const post = posts.find(item => item.id === btn.dataset.read);
+          openPostModal(post);
+        });
+      });
+
+      document.querySelectorAll("[data-clue]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const post = posts.find(item => item.id === btn.dataset.clue);
+          addClue(post.clue);
+        });
+      });
+    }
+
+    function openPostModal(post) {
+      modalBody.innerHTML = `
+        <div class="post-detail">
+          <div class="post-header">
+            <div class="avatar ${post.avatarClass}">${post.author.charAt(0)}</div>
+            <div class="user-meta">
+              <div class="user-name">${post.author}</div>
+              <div class="user-tag">${post.handle} · ${post.time}</div>
+            </div>
+          </div>
+          <p class="post-body">${post.body}</p>
+          <div class="post-highlight">
+            ${post.tags.map(tag => `<span class="hash-tag">${tag}</span>`).join("")}
+          </div>
+          <div class="post-meta">
+            <span>💬 28</span>
+            <span>❤️ 412</span>
+            <span>🔁 19</span>
+          </div>
+        </div>
+      `;
+      modal.classList.remove("hidden");
+    }
+
+    function addClue(clue) {
+      if (!clue || discoveredClues.some(item => item.title === clue.title)) {
+        answerFeedback.textContent = "這個線索你已經記錄過了。";
+        answerFeedback.className = "answer-feedback";
+        return;
+      }
+
+      discoveredClues.push(clue);
+      state.clueCount = discoveredClues.length;
+      clueCountText.textContent = String(state.clueCount);
+
+      updateProgress();
+      renderClues();
+      answerFeedback.textContent = `已記錄線索：${clue.title}`;
+      answerFeedback.className = "answer-feedback success";
+    }
+
+    function renderClues() {
+      clueList.innerHTML = "";
+
+      if (discoveredClues.length === 0) {
+        clueList.innerHTML = `
+          <div class="empty-state">
+            <p>還沒有發現任何線索</p>
+            <span class="empty-icon">👀</span>
+          </div>
+        `;
+        return;
+      }
+
+      discoveredClues.forEach((clue) => {
+        const item = document.createElement("div");
+        item.className = "clue-item";
+        item.innerHTML = `
+          <h3>${clue.title}</h3>
+          <p>${clue.text}</p>
+        `;
+        clueList.appendChild(item);
+      });
+    }
+
+    function updateProgress() {
+      const maxClues = 5;
+      const progressValue = Math.min(100, Math.round((state.clueCount / maxClues) * 100));
+      state.progress = progressValue;
+      progressText.textContent = `${progressValue}%`;
+
+      if (state.clueCount >= 5) {
+        mysteryText.textContent = "所有線索已蒐集完成，現在輸入正確答案來解鎖真相。";
+      } else {
+        mysteryText.textContent = "根據所有線索，輸入正確答案來解開秘密。";
+      }
+    }
+
+    function bindTabs() {
+      document.querySelectorAll(".tab-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const tab = button.dataset.tab;
+          state.activeTab = tab;
+
+          document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.classList.toggle("active", btn === button);
+          });
+
+          document.querySelectorAll(".tab-panel").forEach(panel => {
+            panel.classList.toggle("active", panel.id === `tab-${tab}`);
+          });
+        });
+      });
+    }
+
+    function handleAnswerSubmit() {
+      const input = answerInput.value.trim();
+
+      if (!input) {
+        answerFeedback.textContent = "請先輸入答案。";
+        answerFeedback.className = "answer-feedback error";
+        return;
+      }
+
+      if (input === secretKey) {
+        answerFeedback.textContent = "答案正確！秘密已解鎖。";
+        answerFeedback.className = "answer-feedback success";
+        showSecretModal();
+      } else {
+        answerFeedback.textContent = "答案錯誤，請再檢查貼文與線索。";
+        answerFeedback.className = "answer-feedback error";
+      }
+    }
+
+    function showSecretModal() {
+      state.unlocked = true;
+      secretTitle.textContent = "秘密已解鎖";
+      secretMessage.textContent = "原來，『10/10的秘密』不是個單純的字串，而是所有證據中最明確的訊息。這場事件背後，真正的關鍵是：有人刻意用相似的訊息來掩蓋真相，而你已經看見了它。";
+      secretReward.textContent = "完成獎勵：你已揭開校舍事件的真相，獲得「真相觀察者」徽章。";
+      secretModal.classList.remove("hidden");
+    }
+
+    function resetGame() {
+      discoveredClues.length = 0;
+      state.clueCount = 0;
+      state.progress = 0;
+      state.unlocked = false;
+      answerInput.value = "";
+      answerFeedback.textContent = "";
+      answerFeedback.className = "answer-feedback";
+      mysteryText.textContent = "根據所有線索，輸入正確答案來解開秘密。";
+      progressText.textContent = "0%";
+      clueCountText.textContent = "0";
+      secretModal.classList.add("hidden");
+      renderClues();
+      updateProgress();
+    }
+
+    document.getElementById("submit-answer").addEventListener("click", handleAnswerSubmit);
+    document.getElementById("close-modal").addEventListener("click", () => modal.classList.add("hidden"));
+    document.getElementById("close-secret").addEventListener("click", () => secretModal.classList.add("hidden"));
+    document.getElementById("restart-game").addEventListener("click", resetGame);
+
+    answerInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        handleAnswerSubmit();
+      }
+    });
+
+    renderPosts();
+    renderClues();
+    bindTabs();
+    updateProgress();
+  </script>
+</body>
+</html>
