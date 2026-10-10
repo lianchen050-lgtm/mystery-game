@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>10/10的秘密</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- 頂部導航欄 -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="app-title">10/10的秘密</h1>
+        <div class="header-status">
+          <div class="progress-badge">
+            <span class="progress-label">進度</span>
+            <span id="progress-percent" class="progress-value">0%</span>
+          </div>
+          <div class="clue-badge">
+            <span class="clue-icon">🔍</span>
+            <span id="clue-count" class="clue-value">0</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主容器 -->
+    <main class="main-container">
+      <!-- 貼文列表區域 -->
+      <section class="feed-section">
+        <div class="feed-header">
+          <button id="feed-btn" class="feed-tab active" data-tab="all">所有貼文</button>
+          <button id="clues-btn" class="feed-tab" data-tab="clues">發現的線索</button>
+          <button id="mystery-btn" class="feed-tab" data-tab="mystery">謎題</button>
+        </div>
+
+        <!-- 所有貼文標籤頁 -->
+        <div id="all-feed" class="feed-content active">
+          <div id="posts-container" class="posts-list">
+            <!-- 動態載入貼文 -->
+          </div>
+        </div>
+
+        <!-- 線索標籤頁 -->
+        <div id="clues-feed" class="feed-content">
+          <div id="clues-container" class="clues-list">
+            <div class="empty-state">
+              <p>還沒有發現任何線索</p>
+              <span class="empty-icon">👀</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 謎題標籤頁 -->
+        <div id="mystery-feed" class="feed-content">
+          <div class="mystery-panel">
+            <div class="mystery-header">
+              <h2>🔐 終極謎題</h2>
+            </div>
+            <div class="mystery-content">
+              <p id="mystery-text">根據所有線索，輸入正確答案來解開秘密。</p>
+              <div class="mystery-input-group">
+                <input 
+                  type="text" 
+                  id="mystery-input" 
+                  class="mystery-input" 
+                  placeholder="輸入答案..." 
+                  maxlength="20"
+                />
+                <button id="mystery-submit" class="mystery-btn">提交</button>
+              </div>
+              <div id="mystery-feedback" class="mystery-feedback"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 貼文詳情彈窗 -->
+    <div id="post-modal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" id="modal-close">&times;</button>
+        <div class="modal-body">
+          <!-- 動態載入內容 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 隱藏內容彈窗 -->
+    <div id="secret-modal" class="modal">
+      <div class="modal-content secret-modal">
+        <button class="modal-close" id="secret-close">&times;</button>
+        <div class="modal-body">
+          <div class="secret-unlock">
+            <div class="secret-icon">✨</div>
+            <h2 id="secret-title">秘密已解鎖</h2>
+            <div id="secret-message" class="secret-text">
+              <!-- 動態載入秘密內容 -->
+            </div>
+            <div id="secret-reward" class="secret-reward">
+              <!-- 動態載入獎勵 -->
+            </div>
+            <button id="secret-restart" class="secret-restart-btn">重新開始遊戲</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 加載指示器 -->
+    <div id="loading" class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
